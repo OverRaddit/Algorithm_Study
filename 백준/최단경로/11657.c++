@@ -10,68 +10,61 @@ using namespace std;
 
 int N,M;
 vector<pair<int,int> > graph[MAX_V];
-vector<ll> upper;
 
-// vector<ll> bellmanFord(int src) {
-bool bellmanFord(int src) {
+vector<ll> bellmanFord(int src) {
+  vector<ll> upper(N, INF);
   upper[src] = 0;
-  bool updated;
 
-  for(int iter=0;iter<N-1;iter++) {
-    updated = false;
+  for(int iter=0;iter<N;iter++) {
     for(int here=0;here<N;here++) {
       for(int j=0;j<graph[here].size();j++) {
         int there = graph[here][j].first;
         int cost = graph[here][j].second;
 
-        if (upper[there] != INF && upper[there] > upper[here] + cost) {
+        if (upper[here] != INF && upper[there] > upper[here] + cost) {
+          if (iter == N-1) return vector<ll>(); // N번째 relax가 성공한 경우, 최단경로에 음의사이클이 존재하므로 빈배열반환
           upper[there] = upper[here] + cost;
-          updated = true;
         }
       }
     }
-    if(!updated) break;
   }
 
   // v번째에는 출발지랑 연결되어있는 케이스만 Relax를 적용
-  for(int here=0;here<N;here++) {
-    for(int j=0;j<graph[here].size();j++) {
-      int there = graph[here][j].first;
-      int cost = graph[here][j].second;
+  // for(int here=0;here<N;here++) {
+  //   for(int j=0;j<graph[here].size();j++) {
+  //     int there = graph[here][j].first;
+  //     int cost = graph[here][j].second;
 
-      if (upper[there] != INF && upper[there] > upper[here] + cost) {
-        return true;
-      }
-    }
-  }
+  //     if (upper[here] != INF && upper[there] > upper[here] + cost) {
+  //       return vector<ll>();
+  //     }
+  //   }
+  // }
 
-  if(updated) upper.clear();
-  return false;
+  return upper;
 }
 
 int main()
 {
   // INPUT
   cin >> N >> M;
-  upper.resize(N, INF);
   int A,B,C;
   for(int i=0;i<M;i++) {
     cin >> A >> B >> C;
     graph[A-1].push_back(make_pair(B-1, C));
   }
 
-  bool isCycle = bellmanFord(1 -1);
+  vector<ll> result = bellmanFord(1 -1);
 
-  if(isCycle)
+  // OUTPUT
+  if(result.empty())
     cout << "-1" << "\n";
   else {
-    for(int i=1;i<upper.size();i++) {
-      if (upper[i] == INF)
+    for(int i=1;i<result.size();i++) {
+      if (result[i] == INF)
         cout << "-1\n";
       else
-        cout << upper[i] << "\n";
+        cout << result[i] << "\n";
     }
   }
-
-  // 만약 그래프에 음의 사이클이 존재하는데, 시작점과끝점이 음의사이클과 연결되지않는다면?
 }
