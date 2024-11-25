@@ -29,18 +29,6 @@ vector<ll> bellmanFord(int src) {
     }
   }
 
-  // v번째에는 출발지랑 연결되어있는 케이스만 Relax를 적용
-  // for(int here=0;here<N;here++) {
-  //   for(int j=0;j<graph[here].size();j++) {
-  //     int there = graph[here][j].first;
-  //     int cost = graph[here][j].second;
-
-  //     if (upper[here] != INF && upper[there] > upper[here] + cost) {
-  //       return vector<ll>();
-  //     }
-  //   }
-  // }
-
   return upper;
 }
 
