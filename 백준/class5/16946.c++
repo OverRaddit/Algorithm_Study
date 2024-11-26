@@ -4,16 +4,25 @@
 using namespace std;
 
 int N,M;
-int map[1000][1000] = {0};
-int sum[1000][1000] = {0};
-int answer[1000][1000] = {0};
+int graph[1000][1000] = {0};
 bool visited[1000][1000] = {0};
 int dy[4] = {0,0,-1,1};
 int dx[4] = {1,-1,0,0};
 vector<pair<int,int> > walls;
 
+void printGraph()
+{
+  // cout << "\n";
+  for(int i=0;i<N;i++) {
+    for(int j=0;j<M;j++) {
+      cout << graph[i][j] % 10;
+    }
+    cout << "\n";
+  }
+}
+
 int bfs(int y, int x) {
-  // bool visited[1000][1000] = {0};
+  vector<pair<int,int> > walls;
   int ret = 0;
   queue<pair<int,int> > q;
   q.push(make_pair(y,x));
@@ -28,10 +37,20 @@ int bfs(int y, int x) {
       int ny = cy + dy[i];
       int nx = cx + dx[i];
       if (ny>=N||nx>=M||ny<0||nx<0) continue; // 영역박
-      if (visited[ny][nx] || map[ny][nx] != 0) continue; // 방문 or 빈칸x
-      q.push(make_pair(ny,nx));
+      if (visited[ny][nx]) continue;
+      if (graph[ny][nx] >= 1) {
+        walls.push_back(make_pair(ny,nx));
+      }
+      else if (graph[ny][nx] == 0) {
+        q.push(make_pair(ny,nx));
+      }
       visited[ny][nx] = true;
     }
+  }
+
+  for(int i=0;i<walls.size();i++) {
+    graph[walls[i].first][walls[i].second] += ret;
+    visited[walls[i].first][walls[i].second] = false;
   }
   return ret;
 }
@@ -44,46 +63,19 @@ int main()
   for(int i=0;i<N;i++) {
     cin >> s;
     for(int j=0;j<s.size();j++) {
-      map[i][j] = s[j] - '0';
-      if(map[i][j] == 1) walls.push_back(make_pair(i,j));
+      graph[i][j] = s[j] - '0';
+      if(graph[i][j] == 1) walls.push_back(make_pair(i,j));
     }
   }
 
-  // [시간초과]모든 벽을 부수고 각 케이스마다 BFS수행
-  // for(int i=0;i<walls.size();i++) {
-  //   int wallY = walls[i].first;
-  //   int wallX = walls[i].second;
-
-  //   map[wallY][wallX] = 0;
-  //   answer[wallY][wallX] = bfs(wallY, wallX) % 10;
-  //   map[wallY][wallX] = 1;
-  // }
-
-  // 모든 좌표마다 BFS가 수행된
-
+  // 빈칸에서 bfs를 수행하여 벽좌표에 bfs수행영역 칸 수만큼 더함.
   for(int i=0;i<N;i++) {
     for(int j=0;j<M;j++) {
-      bfs(i, j);
-      // bfs 탐색영역의 개수만큼 각 좌표에 저장함.
+      if (graph[i][j] == 0 && !visited[i][j]) {
+        bfs(i, j);
+        // printGraph();
+      }
     }
   }
-  for(int i=0;i<walls.size();i++) {
-    int wallY = walls[i].first;
-    int wallX = walls[i].second;
-
-    for(int j=0;j<4;j++) {
-      int ny = wallY + dy[i];
-      int nx = wallX + dx[i];
-
-      if (ny>=N||nx>=M||ny<0||nx<0) continue; // 영역박
-      answer[wallY][wallX] += sum[ny][nx];
-    }
-  }
-
-  for(int i=0;i<N;i++) {
-    for(int j=0;j<M;j++) {
-      cout << answer[i][j];
-    }
-    cout << "\n";
-  }
+  printGraph();
 }
