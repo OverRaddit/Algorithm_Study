@@ -14,6 +14,7 @@ void solve()
   while(left < right) {
     mid = left + 1;
     int minSum;
+    // 이분탐색 시작.
     while(left < mid && mid < right) {
       int sum = v[left] + v[mid] + v[right];
       if (abs(answer) > abs(sum)) {
