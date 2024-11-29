@@ -1,25 +1,61 @@
 #include <iostream>
 #include <vector>
-#define MAX_N 100'000
-#define MAX_M 1'000'000
-#define MAX_C 1'000
+#include <algorithm>
 using namespace std;
 
 int N,M;
-vector<pair<int,int> > graph[MAX_N];
+vector<pair<int,pair<int,int> > > edges;
+
+struct DisjointSet {
+  vector<int> parents;
+
+  DisjointSet(int v) : parents(vector<int>(v)) {
+    for(int i=0;i<v;i++) parents[i]=i;
+  }
+  int find(int u) {
+    if (parents[u] == u) return u;
+    else return parents[u] = find(parents[u]);
+  }
+
+  void merge(int u, int v) {
+    u = find(u);
+    v = find(v);
+    if (u == v) return;
+    if (u<v) parents[v] = u;
+    else parents[u] = v;
+  }
+};
+
+int kruskal(int& maxWeight) {
+  maxWeight = 0;
+  int totalWeight = 0;
+  DisjointSet sets(N);
+  for(int i=0;i<edges.size();i++) {
+    int cost = edges[i].first;
+    int u = edges[i].second.first;
+    int v = edges[i].second.second;
+    if (sets.find(u) == sets.find(v)) continue;
+    sets.merge(u,v);
+    maxWeight = max(maxWeight, cost);
+    totalWeight += cost;
+  }
+
+  return totalWeight;
+}
 
 int main()
 {
   // INPUT
-  // 임의의 두 집 사이에 경로가 항상 존재하는 입력만 주어진다.
-  // 양방향 그래프
   cin >> N >> M;
   int A,B,C;
   for(int i=0;i<M;i++) {
     cin >> A >> B >> C;
-    graph[A-1].push_back(make_pair(B-1, C));
-    graph[B-1].push_back(make_pair(A-1, C));
+    edges.push_back(make_pair(C,make_pair(A-1,B-1)));
   }
+  sort(edges.begin(), edges.end());
 
-  // 어렵다;;
+  // MST에 포함된 가장큰 간선을 삭제.
+  int maxWeight;
+  int answer = kruskal(maxWeight);
+  cout << answer - maxWeight << "\n";
 }
