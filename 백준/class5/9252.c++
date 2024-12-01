@@ -2,16 +2,17 @@
 #include <string>
 using namespace std;
 
-int DP[1001][1001];
+int DP[1001][1001] = {0}; // DP[x][y] = A의 x번째글자, B의 y번째 글자로 만들 수 있는 LCS의 길이.
 
 int main()
 {
 	ios::sync_with_stdio(false);
-	cin.tie(NULL); cout.tie(NULL);
+  cin.tie(NULL); cout.tie(NULL);
 
-	string A, B;
-	cin >> A >> B;
+  string A, B;
+  cin >> A >> B;
 
+	// 좌측상단에서 우측하단으로, DP를 완성한다.
 	int N = A.size();
 	int M = B.size();
 	for (int i = 1; i <= N; ++i)
@@ -31,6 +32,7 @@ int main()
 
 	string Solution;
 
+	// 우츠
 	int i = N;
 	int j = M;
 	while (i > 0 && j > 0)
