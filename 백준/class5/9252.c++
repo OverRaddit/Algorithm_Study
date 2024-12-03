@@ -32,7 +32,7 @@ int main()
 
 	string Solution;
 
-	// 우츠
+	// 우측하단에서 좌측상단으로 문자열을 역순으로 맞춘다.
 	int i = N;
 	int j = M;
 	while (i > 0 && j > 0)
@@ -53,6 +53,7 @@ int main()
 		}
 	}
 
+	// 저장한 문자열을 다시 역순으로 출력한다.
 	cout << Solution.size() << '\n';
 	for (int i = Solution.size() - 1; i >= 0; --i)
 	{
