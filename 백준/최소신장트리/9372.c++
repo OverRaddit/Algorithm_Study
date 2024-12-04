@@ -1,26 +1,27 @@
 #include <iostream>
 #include <vector>
-
 using namespace std;
 
 int T;
-vector<vector<int> > graph;
+vector<pair<int,int> > edges;
+vector<int> answers;
 
-int kruskal(int src) {
-
-}
+/*
+이 문제 어이가 없는게 ㅋㅋㅋ
+그냥 N-1 출력하면 정답임;;
+*/
 
 void Solve()
 {
   // INPUT
   int N,M,a,b;
   cin >> N >> M;
-  graph.resize(N);
   for(int i=0;i<M;i++) {
     cin >> a >> b;
-    graph[a-1].push_back(b-1);
-    graph[b-1].push_back(a-1);
+    edges.push_back(make_pair(a-1,b-1));
+    edges.push_back(make_pair(b-1,a-1));
   }
+  answers.push_back(N-1);
 }
 
 int main()
@@ -29,8 +30,6 @@ int main()
   for(int i=0;i<T;i++) {
     Solve();
   }
+  for(int i=0;i<answers.size();i++)
+    cout << answers[i] << "\n";
 }
-
-/*
-크루스칼 알고리즘을 써봅시다.
-*/

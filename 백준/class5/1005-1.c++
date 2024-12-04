@@ -3,29 +3,44 @@
 #include <cstring>
 #include <map>
 #include <algorithm>
-// #define INF -1
+#include <queue>
 
 using namespace std;
 
 int T,N,K,W;
+vector<int> D;
 vector<vector<int> > graph;
-int visited[1000] = {0};
-int dp[1000] = {0};
+vector<pair<int,int> > vertexDegree;
+vector<int> dp;
 vector<int> answers;
+// int dp[1000] = {0};
 
-void dfs(int src, int depth) {
-  if (visited[src] != -1) return;
-  visited[src] = depth;
+/*
 
-  for(int i=0;i<graph[src].size();i++) {
-    int there = graph[src][i];
-    if (visited[there] != -1) continue;
-    dfs(there, depth + 1);
+이 문제가 어려웠던 이유
+
+1. 위상정렬로 각 원소를 순회하는 것과 dp를 업데이트하는 타이밍이 헷갈림.
+
+*/
+
+void topol_sort() {
+  queue<int> q;
+
+  for(int i=0;i<vertexDegree.size();i++)
+    if (vertexDegree[i].first == 0)
+      q.push(i);
+
+  while(!q.empty()) {
+    int here = q.front();
+    q.pop();
+    for(int there: graph[here]) {
+      // 이 부분...
+      dp[there] = max(dp[there], dp[here] + D[there]);
+      vertexDegree[there].first--;
+      if (vertexDegree[there].first == 0)
+        q.push(there);
+    }
   }
-}
-
-// src집이 몇차건물인지 반환한다(0~N-1)
-void simpledfs(int src) {
 
 }
 
@@ -33,50 +48,31 @@ void Solve()
 {
   // INPUT
   cin >> N >> K;
-  vector<int> D(N, 0);
+  D.resize(N);
+  graph.clear();
+  graph.resize(N);
+  dp.assign(N, 0); // ?
+  vertexDegree.assign(N, make_pair(0,0));
   for(int i=0;i<N;i++) {
     cin >> D[i];
     dp[i] = D[i];
   }
   int u,v;
-  graph.clear();
-  graph.resize(N);
-  map<int,vector<int> > nthHouse;
-  vector<vector<int> > houseDepen(N);
   for(int i=0;i<K;i++) {
-    cin >> u >> v;
-    houseDepen[u-1].push_back(v-1);
+    cin >> u >> v; // u->v간선이 존재.
+    graph[u-1].push_back(v-1);
+    vertexDegree[v-1].first++;
   }
   cin >> W;
-  memset(visited, -1, sizeof(visited));
-
-  dfs(W-1, 0);
-
-  for(int i=0;i<N;i++) {
-    simpledfs(i);
-  }
-
-
-  map<int,vector<int> > group;
-  for(int i=0;i<N;i++) {
-    int timeStamp = visited[i];
-    group[timeStamp].push_back(i);
-  }
-  int answer = 0;
-  for(auto it=group.crbegin(); it!=group.crend();it++) {
-    if (it->first <= 0) continue;
-    // int maxTime = -1;
-    // for(int i=0;i<it->second.size();i++) {
-    //   maxTime = max(maxTime, D[it->second[i]]);
-    // }
-    // answer += maxTime;
-
-  }
-  answers.push_back(answer);
+  topol_sort();
+  answers.push_back(dp[W-1]);
 }
 
 int main()
 {
+  ios_base::sync_with_stdio(false);
+  cin.tie(NULL);
+
   cin >> T;
   for(int t=0;t<T;t++) {
     Solve();
@@ -85,18 +81,8 @@ int main()
     cout << answers[i] << "\n";
   }
 }
+
 /*
-
-최종건물에서 같은 거리만큼 떨어진 아이들끼리 비교해선 안됨.
-건물을 올리는데 필요한 테크수가 같인 아이들끼리 비교해야함.
-
-dp[i] = i건물을 짓는 최소시간
-1차건물 : 1~X에 대하여 dp[i] = arr[i];
-N차건물 : 1~X에 대하여 dp[i] = max(dp[?],..,dp[?]) + arr[i]
-
-1) 1~N차건물에 해당하는 자료구조를 어떻게 만들 것인가?
-map<int,vector<int> > nthHouse;
-2) 각 건물에 필요한 의존성 건물 목록을 어떻게 만들 것인가? -> 그냥 입력값 그대로 받으면됨.
-vector<vector<int> > houseDepen;
-
+현재 496ms
+-> 빠른입출력 적용하니 144ms
 */
